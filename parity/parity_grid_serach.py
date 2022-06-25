@@ -24,7 +24,7 @@ model_config = {
 training_config = {
     'batch_size':512,
     'lr': 5e-5,
-    'max_step': 3000
+    'max_step': 30000
 }
 
 class MySimpleModel(nn.Module):
@@ -102,15 +102,15 @@ if __name__ == '__main__':
         })
     train_loader = DataLoader(iterable_dataset, batch_size=training_config['batch_size'])
 
-    n_layers_options = [2]
-    n_head_options = [2,4,8]
+    n_layers_options = [1]
+    n_head_options = [8]
     d_model_options = [32]
     configs = []
     for config_option in itertools.product(d_model_options, n_head_options, n_layers_options):
         new_config = {}
         new_config['model_config'] = model_config.copy()
         new_config['model_config']['d_model'] = config_option[0]
-        new_config['model_config']['dim_feedforward'] = config_option[0] * 2
+        new_config['model_config']['dim_feedforward'] = 2048 #config_option[0] * 2
         new_config['model_config']['n_head'] = config_option[1] 
         new_config['model_config']['num_layers'] = config_option[2]
         configs.append(new_config)
@@ -130,10 +130,7 @@ if __name__ == '__main__':
             optimizer.zero_grad()
             output = model(x, clss)
             loss = loss_module(output, y)
-            try:
-                loss_history.append(loss.item())
-            except:
-                print(loss.item())
+            loss_history.append(loss.item())
             loss.backward()
             optimizer.step()
             if i > max_steps:
@@ -148,4 +145,5 @@ if __name__ == '__main__':
                 print('\t'.join(string))
                 print('------------------------')
                 break
+
 
